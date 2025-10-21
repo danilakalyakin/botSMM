@@ -142,7 +142,7 @@ def get_application_phone(message, name):
     save_application(application)
     
     # 🔹 Отправляем администратору в Telegram
-    admin_chat_id = 123456789  # <-- замените на свой Telegram ID
+    admin_chat_id = 865082717  # <-- замените на свой Telegram ID
     bot.send_message(admin_chat_id, f"📩 Новая заявка:\nИмя: {name}\nТелефон: {phone}")
 
     # Сообщение пользователю
