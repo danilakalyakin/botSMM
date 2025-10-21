@@ -89,7 +89,6 @@ def send_support_link(message):
     msg = bot.send_message(message.chat.id, f"📞 Связаться с администратором можно здесь: {link}", reply_markup=get_main_menu())
     save_message(message.chat.id, msg.message_id)
 
-# ---------- ОЧИСТКА ЧАТА ----------
 def clear_chat(message):
     chat_id = message.chat.id
     msgs = user_messages.get(chat_id, [])
@@ -98,17 +97,20 @@ def clear_chat(message):
         bot.send_message(chat_id, "⚠️ В чате нет сообщений для удаления.", reply_markup=get_main_menu())
         return
 
-    # Анимация очистки
-    anim_msg = bot.send_message(chat_id, "🧹 Очистка чата: 0%")
-    total = len(msgs)
+    # Создаём анимацию прогресса
+    try:
+        anim_msg = bot.send_message(chat_id, "🧹 Очистка чата: 0%")
+    except:
+        anim_msg = None
 
+    total = len(msgs)
     for i, msg_id in enumerate(msgs):
         try:
             bot.delete_message(chat_id, msg_id)
         except:
             pass
         # Обновляем анимацию каждые 5 сообщений
-        if i % 5 == 0:
+        if anim_msg and i % 5 == 0:
             try:
                 percent = int((i / total) * 100)
                 bot.edit_message_text(f"🧹 Очистка чата: {percent}%", chat_id, anim_msg.message_id)
@@ -117,9 +119,12 @@ def clear_chat(message):
         time.sleep(0.05)
 
     # Финальное сообщение
-    try:
-        bot.edit_message_text("✅ Ваш чат очищен!", chat_id, anim_msg.message_id, reply_markup=get_main_menu())
-    except:
+    if anim_msg:
+        try:
+            bot.edit_message_text("✅ Ваш чат очищен!", chat_id, anim_msg.message_id, reply_markup=get_main_menu())
+        except:
+            bot.send_message(chat_id, "✅ Ваш чат очищен!", reply_markup=get_main_menu())
+    else:
         bot.send_message(chat_id, "✅ Ваш чат очищен!", reply_markup=get_main_menu())
 
     # Очищаем память для этого пользователя
@@ -182,11 +187,13 @@ def save_application(application):
     with open(APPLICATIONS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-# ---------- СОХРАНЕНИЕ МЕССАДЖЕЙ ----------
-def save_message(chat_id, msg_id):
+# ---------- СОХРАНЕНИЕ ВСЕХ МЕССАДЖЕЙ ----------
+@bot.message_handler(func=lambda m: True)
+def save_all_messages(message):
+    chat_id = message.chat.id
     if chat_id not in user_messages:
         user_messages[chat_id] = []
-    user_messages[chat_id].append(msg_id)
+    user_messages[chat_id].append(message.message_id)
 
 # ---------- CALLBACK ----------
 @bot.callback_query_handler(func=lambda call: True)
