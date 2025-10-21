@@ -92,16 +92,38 @@ def send_support_link(message):
 # ---------- ОЧИСТКА ЧАТА ----------
 def clear_chat(message):
     chat_id = message.chat.id
-    if chat_id in user_messages:
-        for msg_id in user_messages[chat_id]:
+    msgs = user_messages.get(chat_id, [])
+
+    if not msgs:
+        bot.send_message(chat_id, "⚠️ В чате нет сообщений для удаления.", reply_markup=get_main_menu())
+        return
+
+    # Анимация очистки
+    anim_msg = bot.send_message(chat_id, "🧹 Очистка чата: 0%")
+    total = len(msgs)
+
+    for i, msg_id in enumerate(msgs):
+        try:
+            bot.delete_message(chat_id, msg_id)
+        except:
+            pass
+        # Обновляем анимацию каждые 5 сообщений
+        if i % 5 == 0:
             try:
-                bot.delete_message(chat_id, msg_id)
+                percent = int((i / total) * 100)
+                bot.edit_message_text(f"🧹 Очистка чата: {percent}%", chat_id, anim_msg.message_id)
             except:
                 pass
-        user_messages[chat_id] = []
+        time.sleep(0.05)
 
-    final_msg = bot.send_message(chat_id, "✅ Чат очищен!", reply_markup=get_main_menu())
-    save_message(chat_id, final_msg.message_id)
+    # Финальное сообщение
+    try:
+        bot.edit_message_text("✅ Ваш чат очищен!", chat_id, anim_msg.message_id, reply_markup=get_main_menu())
+    except:
+        bot.send_message(chat_id, "✅ Ваш чат очищен!", reply_markup=get_main_menu())
+
+    # Очищаем память для этого пользователя
+    user_messages[chat_id] = []
 
 # ---------- О БОТЕ ----------
 def show_about(message):
