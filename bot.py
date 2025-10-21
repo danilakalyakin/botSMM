@@ -3,7 +3,7 @@ from telebot import types
 from flask import Flask, request
 import json
 import os
-import threading
+import time
 
 # 🔹 Токен бота
 TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"
@@ -26,6 +26,12 @@ def get_main_menu():
     markup.add("ℹ️ О боте", "📝 Оставить заявку")
     return markup
 
+# ---------- СОХРАНЕНИЕ МЕССАДЖЕЙ ----------
+def save_message(chat_id, msg_id):
+    if chat_id not in user_messages:
+        user_messages[chat_id] = []
+    user_messages[chat_id].append(msg_id)
+
 # ---------- START ----------
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -39,21 +45,25 @@ def start(message):
 # ---------- ТЕКСТ ----------
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    if message.text == "📚 Кейсы":
+    chat_id = message.chat.id
+    text = message.text
+    save_message(chat_id, message.message_id)  # сохраняем сообщение пользователя
+
+    if text == "📚 Кейсы":
         send_cases(message)
-    elif message.text == "👨‍🏫 Тарифы":
+    elif text == "👨‍🏫 Тарифы":
         send_tariffs(message)
-    elif message.text == "📞 Поддержка":
+    elif text == "📞 Поддержка":
         send_support_link(message)
-    elif message.text == "🧹 Очистить чат":
+    elif text == "🧹 Очистить чат":
         clear_chat(message)
-    elif message.text == "ℹ️ О боте":
+    elif text == "ℹ️ О боте":
         show_about(message)
-    elif message.text == "📝 Оставить заявку":
+    elif text == "📝 Оставить заявку":
         start_application(message)
     else:
-        msg = bot.send_message(message.chat.id, "Я не понимаю эту команду 😅", reply_markup=get_main_menu())
-        save_message(message.chat.id, msg.message_id)
+        msg = bot.send_message(chat_id, "Я не понимаю эту команду 😅", reply_markup=get_main_menu())
+        save_message(chat_id, msg.message_id)
 
 # ---------- КЕЙСЫ ----------
 def send_cases(message):
@@ -68,6 +78,7 @@ def send_cases(message):
         text = f"📘 <b>{c['title']}</b>\n\n{c['desc']}"
         msg = bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=markup)
         save_message(message.chat.id, msg.message_id)
+        time.sleep(0.1)  # чтобы Telegram не блокировал быстрые отправки
 
 # ---------- ТАРИФЫ ----------
 def send_tariffs(message):
@@ -82,6 +93,7 @@ def send_tariffs(message):
         text = f"💼 <b>{t['name']}</b> — {t['price']}\n{t['desc']}"
         msg = bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=markup)
         save_message(message.chat.id, msg.message_id)
+        time.sleep(0.1)
 
 # ---------- ПОДДЕРЖКА ----------
 def send_support_link(message):
@@ -89,17 +101,19 @@ def send_support_link(message):
     msg = bot.send_message(message.chat.id, f"📞 Связаться с администратором можно здесь: {link}", reply_markup=get_main_menu())
     save_message(message.chat.id, msg.message_id)
 
+# ---------- ОЧИСТКА ЧАТА ----------
 def clear_chat(message):
     chat_id = message.chat.id
     msgs = user_messages.get(chat_id, [])
 
     if not msgs:
-        bot.send_message(chat_id, "⚠️ В чате нет сообщений для удаления.", reply_markup=get_main_menu())
+        msg = bot.send_message(chat_id, "⚠️ В чате нет сообщений для удаления.", reply_markup=get_main_menu())
+        save_message(chat_id, msg.message_id)
         return
 
-    # Создаём анимацию прогресса
     try:
         anim_msg = bot.send_message(chat_id, "🧹 Очистка чата: 0%")
+        save_message(chat_id, anim_msg.message_id)
     except:
         anim_msg = None
 
@@ -109,7 +123,7 @@ def clear_chat(message):
             bot.delete_message(chat_id, msg_id)
         except:
             pass
-        # Обновляем анимацию каждые 5 сообщений
+
         if anim_msg and i % 5 == 0:
             try:
                 percent = int((i / total) * 100)
@@ -127,7 +141,6 @@ def clear_chat(message):
     else:
         bot.send_message(chat_id, "✅ Ваш чат очищен!", reply_markup=get_main_menu())
 
-    # Очищаем память для этого пользователя
     user_messages[chat_id] = []
 
 # ---------- О БОТЕ ----------
@@ -164,10 +177,10 @@ def get_application_phone(message, name):
     chat_id = message.chat.id
     phone = message.text
     application = {"name": name, "phone": phone}
-    
+
     # Сохраняем в файл
     save_application(application)
-    
+
     # 🔹 Отправляем администратору в Telegram
     admin_chat_id = 865082717  # <-- замените на свой Telegram ID
     bot.send_message(admin_chat_id, f"📩 Новая заявка:\nИмя: {name}\nТелефон: {phone}")
@@ -175,7 +188,6 @@ def get_application_phone(message, name):
     # Сообщение пользователю
     msg = bot.send_message(chat_id, "✅ Ваша заявка принята! Мы вам перезвоним.", reply_markup=get_main_menu())
     save_message(chat_id, msg.message_id)
-
 
 def save_application(application):
     if os.path.exists(APPLICATIONS_FILE):
@@ -186,14 +198,6 @@ def save_application(application):
     data.append(application)
     with open(APPLICATIONS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
-
-# ---------- СОХРАНЕНИЕ ВСЕХ МЕССАДЖЕЙ ----------
-@bot.message_handler(func=lambda m: True)
-def save_all_messages(message):
-    chat_id = message.chat.id
-    if chat_id not in user_messages:
-        user_messages[chat_id] = []
-    user_messages[chat_id].append(message.message_id)
 
 # ---------- CALLBACK ----------
 @bot.callback_query_handler(func=lambda call: True)
