@@ -19,11 +19,15 @@ APPLICATIONS_FILE = "applications.json"
 user_messages = {}
 
 # ---------- ПАНЕЛЬ ----------
-def get_main_menu():
+def get_main_menu(chat_id=None):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add("📚 Кейсы", "👨‍🏫 Тарифы")
     markup.add("📞 Поддержка", "🧹 Очистить чат")
     markup.add("ℹ️ О боте", "📝 Оставить заявку")
+    
+    # Если это админ, добавляем кнопку "📢 Рассылка"
+    if chat_id == ADMIN_CHAT_ID:
+        markup.add("📢 Рассылка")
     return markup
 
 # ---------- СОХРАНЕНИЕ МЕССАДЖЕЙ ----------
@@ -61,9 +65,13 @@ def handle_text(message):
         show_about(message)
     elif text == "📝 Оставить заявку":
         start_application(message)
+    elif text == "📢 Рассылка" and chat_id == ADMIN_CHAT_ID:
+        msg = bot.send_message(ADMIN_CHAT_ID, "📝 Введите текст для рассылки всем пользователям:")
+        bot.register_next_step_handler(msg, broadcast_send)
     else:
-        msg = bot.send_message(chat_id, "Я не понимаю эту команду 😅", reply_markup=get_main_menu())
+        msg = bot.send_message(chat_id, "Я не понимаю эту команду 😅", reply_markup=get_main_menu(chat_id))
         save_message(chat_id, msg.message_id)
+
 
 # ---------- КЕЙСЫ ----------
 def send_cases(message):
@@ -222,6 +230,7 @@ def broadcast_send(message):
         except:
             failed += 1
     bot.send_message(ADMIN_CHAT_ID, f"✅ Рассылка завершена!\nОтправлено: {count}\nНе удалось отправить: {failed}")
+
 
 # ---------- CALLBACK ----------
 @bot.callback_query_handler(func=lambda call: True)
