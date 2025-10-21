@@ -5,7 +5,7 @@ import json
 import os
 
 # 🔹 Токен бота
-TOKEN = "ВАШ_ТОКЕН_ОТ_БОТА"
+TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"
 bot = telebot.TeleBot(TOKEN)
 
 # 🔹 Ник администратора
@@ -174,7 +174,7 @@ def callback_inline(call):
 
 # ---------- FLASK ----------
 app = Flask(__name__)
-WEBHOOK_URL = "https://YOUR-HOST-NAME.com/"  # <-- заменить на свой URL
+WEBHOOK_URL = "https://botsmm.onrender.com/"  # <-- заменить на свой URL
 
 @app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
