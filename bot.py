@@ -137,9 +137,18 @@ def get_application_phone(message, name):
     chat_id = message.chat.id
     phone = message.text
     application = {"name": name, "phone": phone}
+    
+    # Сохраняем в файл
     save_application(application)
+    
+    # 🔹 Отправляем администратору в Telegram
+    admin_chat_id = 123456789  # <-- замените на свой Telegram ID
+    bot.send_message(admin_chat_id, f"📩 Новая заявка:\nИмя: {name}\nТелефон: {phone}")
+
+    # Сообщение пользователю
     msg = bot.send_message(chat_id, "✅ Ваша заявка принята! Мы вам перезвоним.", reply_markup=get_main_menu())
     save_message(chat_id, msg.message_id)
+
 
 def save_application(application):
     if os.path.exists(APPLICATIONS_FILE):
