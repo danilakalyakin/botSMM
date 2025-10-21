@@ -174,7 +174,7 @@ def callback_inline(call):
 
 # ---------- FLASK ----------
 app = Flask(__name__)
-WEBHOOK_URL = "https://botsmm.onrender.com/"  # <-- заменить на свой URL
+WEBHOOK_URL = "https://botsmm.onrender.com/"  # твой реальный URL
 
 @app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
@@ -182,6 +182,26 @@ def webhook():
     update = telebot.types.Update.de_json(json_str)
     bot.process_new_updates([update])
     return "OK", 200
+
+@app.route("/", methods=["GET"])
+def index():
+    return "Bot is running!", 200
+
+
+# ---------- ВЕБХУК УСТАНОВКА ----------
+import threading
+
+def set_webhook():
+    bot.remove_webhook()
+    success = bot.set_webhook(url=WEBHOOK_URL + TOKEN)
+    if success:
+        print("Webhook установлен ✅")
+    else:
+        print("Ошибка при установке вебхука ❌")
+
+# Устанавливаем вебхук при старте Flask (через поток, чтобы не блокировать)
+threading.Thread(target=set_webhook).start()
+
 
 # ---------- ЗАПУСК ----------
 bot.remove_webhook()
