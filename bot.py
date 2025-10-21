@@ -199,6 +199,30 @@ def save_application(application):
     with open(APPLICATIONS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
+# ---------- РАССЫЛКА ДЛЯ АДМИНА ----------
+ADMIN_CHAT_ID = 865082717  # Telegram ID администратора
+
+@bot.message_handler(commands=['broadcast'])
+def broadcast_start(message):
+    if message.chat.id != ADMIN_CHAT_ID:
+        return  # Только админ может использовать
+    msg = bot.send_message(ADMIN_CHAT_ID, "📝 Введите текст для рассылки всем пользователям:")
+    bot.register_next_step_handler(msg, broadcast_send)
+
+def broadcast_send(message):
+    if message.chat.id != ADMIN_CHAT_ID:
+        return
+    text_to_send = message.text
+    count = 0
+    failed = 0
+    for chat_id in user_messages.keys():
+        try:
+            bot.send_message(chat_id, text_to_send)
+            count += 1
+        except:
+            failed += 1
+    bot.send_message(ADMIN_CHAT_ID, f"✅ Рассылка завершена!\nОтправлено: {count}\nНе удалось отправить: {failed}")
+
 # ---------- CALLBACK ----------
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
