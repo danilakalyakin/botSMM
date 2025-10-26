@@ -7,6 +7,7 @@ import time
 TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"  # вставь токен бота
 bot = telebot.TeleBot(TOKEN)
 
+CHANNEL_USERNAME = "casesshishpromotion"
 ADMIN_CHAT_ID = 865082717
 ADMIN_USERNAME = "danilkalyakin"
 APPLICATIONS_FILE = "applications.json"
@@ -83,19 +84,21 @@ def handle_text(message):
         save_message(chat_id, msg.message_id)
 
 # ---------- КЕЙСЫ ----------
+CHANNEL_USERNAME = "shish_promotion"
+
 def send_cases(message):
     cases = [
-        {"title": "Кейс 1", "desc": "Пример кейса №1 — описание проекта.", "link": f"https://t.me/{ADMIN_USERNAME}"},
-        {"title": "Кейс 2", "desc": "Пример кейса №2 — результаты работы.", "link": f"https://t.me/{ADMIN_USERNAME}"},
-        {"title": "Кейс 3", "desc": "Пример кейса №3 — кейс из реальной практики.", "link": f"https://t.me/{ADMIN_USERNAME}"}
+        {"title": "Кейс 1", "desc": "Успешное продвижение бренда Вконтакте", "link": f"https://t.me/{CHANNEL_USERNAME}/5"},
+        {"title": "Кейс 2", "desc": "Точный таргетинг для бренда с использованием собственного софта", "link": f"https://t.me/{CHANNEL_USERNAME}/6"},
+        {"title": "Кейс 3", "desc": "Эффективное продвижение бренда через точный таргетинг", "link": f"https://t.me/{CHANNEL_USERNAME}/7"}
     ]
     for c in cases:
         markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("✉️ Связаться", url=c["link"]))
+        markup.add(types.InlineKeyboardButton("📌 Подробнее", url=c["link"]))
         text = f"📘 <b>{c['title']}</b>\n\n{c['desc']}"
         msg = bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=markup)
         save_message(message.chat.id, msg.message_id)
-        time.sleep(0.1)
+
 
 # ---------- ТАРИФЫ ----------
 def send_tariffs(message):
