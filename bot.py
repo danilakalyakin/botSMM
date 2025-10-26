@@ -247,18 +247,19 @@ def callback_inline(call):
         save_message(call.message.chat.id, msg.message_id)
 
 # ---------- FLASK ----------
-app = Flask(__name__)
-WEBHOOK_URL = "https://109.69.21.133/"  # Укажи публичный IP или домен с https
+# app = Flask(__name__)
+# WEBHOOK_URL = "https://109.69.21.133/"  # Укажи публичный IP или домен с https
 
-@app.route('/' + TOKEN, methods=['POST'])
-def webhook():
-    json_str = request.get_data().decode("utf-8")
-    update = telebot.types.Update.de_json(json_str)
-    bot.process_new_updates([update])
-    return "OK", 200
+# @app.route('/' + TOKEN, methods=['POST'])
+# def webhook():
+#     json_str = request.get_data().decode("utf-8")
+#     update = telebot.types.Update.de_json(json_str)
+#     bot.process_new_updates([update])
+#     return "OK", 200
 
 # ---------- ЗАПУСК ----------
 if __name__ == "__main__":
-    bot.remove_webhook()
-    bot.set_webhook(url=WEBHOOK_URL + TOKEN)
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    # bot.remove_webhook()
+    # bot.set_webhook(url=WEBHOOK_URL + TOKEN)
+    # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    bot.infinity_polling()
