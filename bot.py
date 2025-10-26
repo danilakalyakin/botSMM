@@ -85,9 +85,9 @@ def handle_text(message):
 # ---------- КЕЙСЫ ----------
 def send_cases(message):
     cases = [
-        {"title": "Кейс 1", "desc": "Пример кейса №1 — описание проекта.", "link": f"https://t.me/{admin_username}"},
-        {"title": "Кейс 2", "desc": "Пример кейса №2 — результаты работы.", "link": f"https://t.me/{admin_username}"},
-        {"title": "Кейс 3", "desc": "Пример кейса №3 — кейс из реальной практики.", "link": f"https://t.me/{admin_username}"}
+        {"title": "Кейс 1", "desc": "Пример кейса №1 — описание проекта.", "link": f"https://t.me/{ADMIN_USERNAME}"},
+        {"title": "Кейс 2", "desc": "Пример кейса №2 — результаты работы.", "link": f"https://t.me/{ADMIN_USERNAME}"},
+        {"title": "Кейс 3", "desc": "Пример кейса №3 — кейс из реальной практики.", "link": f"https://t.me/{ADMIN_USERNAME}"}
     ]
     for c in cases:
         markup = types.InlineKeyboardMarkup()
@@ -114,7 +114,7 @@ def send_tariffs(message):
 
 # ---------- ПОДДЕРЖКА ----------
 def send_support_link(message):
-    link = f"https://t.me/{admin_username}"
+    link = f"https://t.me/{ADMIN_USERNAME}"
     msg = bot.send_message(message.chat.id, f"📞 Связаться с администратором можно здесь: {link}", reply_markup=get_main_menu())
     save_message(message.chat.id, msg.message_id)
 
@@ -170,7 +170,7 @@ def show_about(message):
 📞 Поддержка — связь с менеджером  
 
 Администратор на связи: <b>Danila Kalyakin</b>  
-Контакт: https://t.me/{admin_username}
+Контакт: https://t.me/{ADMIN_USERNAME}
 """
     msg = bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=get_main_menu(message.chat.id))
     save_message(message.chat.id, msg.message_id)
@@ -241,7 +241,7 @@ def callback_inline(call):
         }.get(name, "Описание тарифа не найдено.")
 
         markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("🚀 Начать", url=f"https://t.me/{admin_username}"))
+        markup.add(types.InlineKeyboardButton("🚀 Начать", url=f"https://t.me/{ADMIN_USERNAME}"))
         msg = bot.send_message(call.message.chat.id, f"📋 <b>{name}</b>\n\n{desc}", parse_mode="HTML", reply_markup=markup)
         save_message(call.message.chat.id, msg.message_id)
 
