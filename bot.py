@@ -8,6 +8,7 @@ TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"  # вставь ток�
 bot = telebot.TeleBot(TOKEN)
 
 ADMIN_CHAT_ID = 865082717
+ADMIN_USERNAME = "danilkalyakin"
 APPLICATIONS_FILE = "applications.json"
 USERS_FILE = "user.json"
 user_messages = {}
