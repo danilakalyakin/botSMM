@@ -84,7 +84,6 @@ def handle_text(message):
         save_message(chat_id, msg.message_id)
 
 # ---------- КЕЙСЫ ----------
-CHANNEL_USERNAME = "shish_promotion"
 
 def send_cases(message):
     cases = [
