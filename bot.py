@@ -6,7 +6,6 @@ import time
 
 TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"  # вставь токен бота
 bot = telebot.TeleBot(TOKEN)
-app = Flask(__name__)
 
 ADMIN_CHAT_ID = 865082717
 APPLICATIONS_FILE = "applications.json"
