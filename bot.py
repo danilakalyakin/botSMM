@@ -5,22 +5,14 @@ import json
 import os
 import time
 
-# 🔹 Токен бота
-TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"
+TOKEN = "7990097395:AAEKXo3sP-bu32bfVSscCI26aFmoibLcm5Y"  # вставь токен бота
 bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
 
-# 🔹 Ник администратора
-admin_username = "danilkalyakin"
-
-# 🔹 Файлы для хранения заявок и пользователей
-APPLICATIONS_FILE = "applications.json"
-USERS_FILE = "users.json"
-
-# 🔹 Храним ID сообщений для возможной очистки
-user_messages = {}
-
-# 🔹 ID администратора
 ADMIN_CHAT_ID = 865082717
+APPLICATIONS_FILE = "applications.json"
+USERS_FILE = "user.json"
+user_messages = {}
 
 # ---------- ПАНЕЛЬ ----------
 def get_main_menu(chat_id=None):
@@ -256,9 +248,9 @@ def callback_inline(call):
 
 # ---------- FLASK ----------
 app = Flask(__name__)
-WEBHOOK_URL = "https://botsmm.onrender.com/"  # <-- заменить на свой URL
+WEBHOOK_URL = "https://109.69.21.133/"  # Укажи публичный IP или домен с https
 
-@app.route(f"/{TOKEN}", methods=["POST"])
+@app.route('/' + TOKEN, methods=['POST'])
 def webhook():
     json_str = request.get_data().decode("utf-8")
     update = telebot.types.Update.de_json(json_str)
