@@ -246,4 +246,5 @@ def callback_inline(call):
 
 # ---------- ЗАПУСК ----------
 if __name__ == "__main__":
+    bot.remove_webhook()
     bot.infinity_polling()
